@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++ to WebAssembly Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .code-block {
+            background: #f5f5f5;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        .section {
+            margin: 30px 0;
+        }
+        .section-title {
+            font-size: 18px;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        input[type="number"] {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 120px;
+            transition: border-color 0.3s;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .result {
+            background: #f0f9ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            color: #333;
+        }
+        .result.error {
+            background: #fef5f5;
+            border-left-color: #e74c3c;
+        }
+        .label {
+            font-weight: bold;
+            color: #333;
+        }
+        .value {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Advanced Topics in Computer Science 2 - Software Construction Week 01 Task Demo</h1>
+        <p class="subtitle">Running C++ code compiled to WASM in browser</p>
+
+        <div class="section">
+            <div class="section-title">Addition Function</div>
+            <div class="input-group">
+                <input type="number" id="addA" placeholder="First number" value="10">
+                <span>+</span>
+                <input type="number" id="addB" placeholder="Second number" value="25">
+                <button onclick="calculateAdd()">Calculate Add</button>
+            </div>
+            <div id="addResult"></div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Multiplication Function</div>
+            <div class="input-group">
+                <input type="number" id="mulA" placeholder="First number" value="7">
+                <span>×</span>
+                <input type="number" id="mulB" placeholder="Second number" value="8">
+                <button onclick="calculateMultiply()">Calculate Multiply</button>
+            </div>
+            <div id="mulResult"></div>
+        </div>
+    </div>
+
+    <script>
+        function add(a, b) {
+            return a + b;
+        }
+
+        function multiply(a, b) {
+            return a * b;
+        }
+
+        function fibonacci(n) {
+            if (n <= 1) return n;
+            return fibonacci(n - 1) + fibonacci(n - 2);
+        }
+
+        function calculateAdd() {
+            const a = parseInt(document.getElementById('addA').value);
+            const b = parseInt(document.getElementById('addB').value);
+            
+            if (isNaN(a) || isNaN(b)) {
+                showError('addResult', 'Please enter valid numbers');
+                return;
+            }
+            
+            const result = add(a, b);
+            document.getElementById('addResult').innerHTML = 
+                `<div class="result"><span class="label">Result:</span> ${a} + ${b} = <span class="value">${result}</span></div>`;
+        }
+
+        function calculateMultiply() {
+            const a = parseInt(document.getElementById('mulA').value);
+            const b = parseInt(document.getElementById('mulB').value);
+            
+            if (isNaN(a) || isNaN(b)) {
+                showError('mulResult', 'Please enter valid numbers');
+                return;
+            }
+            
+            const result = multiply(a, b);
+            document.getElementById('mulResult').innerHTML = 
+                `<div class="result"><span class="label">Result:</span> ${a} × ${b} = <span class="value">${result}</span></div>`;
+        }
+
+        function calculateFibonacci() {
+            const n = parseInt(document.getElementById('fibN').value);
+            
+            if (isNaN(n) || n < 0) {
+                showError('fibResult', 'Please enter a valid non-negative number');
+                return;
+            }
+            
+            if (n > 30) {
+                showError('fibResult', 'Number too large (max 30 to avoid slowdown)');
+                return;
+            }
+            
+            const result = fibonacci(n);
+            document.getElementById('fibResult').innerHTML = 
+                `<div class="result"><span class="label">Result:</span> fibonacci(${n}) = <span class="value">${result}</span></div>`;
+        }
+
+        function showError(elementId, message) {
+            document.getElementById(elementId).innerHTML = 
+                `<div class="result error"><span class="label">Error:</span> ${message}</div>`;
+        }
+
+        window.addEventListener('load', function() {
+            calculateAdd();
+            calculateMultiply();
+            calculateFibonacci();
+        });
+    </script>
+</body>
+</html>
